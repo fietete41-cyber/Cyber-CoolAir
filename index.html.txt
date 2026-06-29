@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyber-Cool Garage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-cyan: #00f3ff;
+            --neon-pink: #ff003c;
+            --neon-green: #39ff14;
+            --neon-yellow: #ffea00;
+            --dark-bg: #0b0c10;
+            --panel-bg: #1f2833;
+        }
+
+        body {
+            font-family: 'Chakra Petch', sans-serif;
+            background-color: var(--dark-bg);
+            color: #c5c6c7;
+            overflow-x: hidden;
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .neon-border {
+            border: 1px solid var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3), inset 0 0 10px rgba(0, 243, 255, 0.1);
+        }
+
+        .neon-text {
+            color: var(--neon-cyan);
+            text-shadow: 0 0 8px rgba(0, 243, 255, 0.8);
+        }
+
+        .btn-primary {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-family: 'Chakra Petch', sans-serif;
+            transition: all 0.3s ease;
+            width: 100%;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-primary:hover {
+            background: var(--neon-cyan);
+            color: var(--dark-bg);
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .name-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: rgba(11, 12, 16, 0.8);
+            border: 1px solid #45a29e;
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 1.1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .name-input:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+        .input-error {
+            border-color: var(--neon-pink) !important;
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.5) !important;
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+
+        .part-item {
+            background: rgba(31, 40, 51, 0.8);
+            border: 1px solid #45a29e;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .part-item:hover, .part-item.selected {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            transform: scale(1.05);
+        }
+        .part-item.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+            filter: grayscale(100%);
+        }
+
+        .blueprint-slot {
+            border: 2px dashed #45a29e;
+            border-radius: 10px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: rgba(0, 0, 0, 0.3);
+            color: #45a29e;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .blueprint-slot.active {
+            border-color: var(--neon-cyan);
+            background: rgba(0, 243, 255, 0.1);
+            color: var(--neon-cyan);
+            border-style: solid;
+        }
+        .blueprint-slot.installed {
+            border-color: var(--neon-green);
+            background: rgba(57, 255, 20, 0.1);
+            color: var(--neon-green);
+            border-style: solid;
+            pointer-events: none;
+        }
+
+        .alert-flash {
+            animation: flashRed 1s infinite;
+        }
+        @keyframes flashRed {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(255, 0, 60, 0.2); }
+        }
+
+        /* ✅ แก้ CSS bug: เพิ่ม selector ที่หายไป */
+        .colorful-robot {
+            background: linear-gradient(45deg, #00f3ff, #39ff14, #ffea00, #ff003c, #00f3ff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbowGlow 4s linear infinite;
+            display: inline-block;
+        }
+        @keyframes rainbowGlow {
+            0% { filter: drop-shadow(0 0 2px #00f3ff) hue-rotate(0deg); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 8px #39ff14) hue-rotate(180deg); transform: scale(1.15); }
+            100% { filter: drop-shadow(0 0 2px #00f3ff) hue-rotate(360deg); transform: scale(1); }
+        }
+
+        .chat-box::-webkit-scrollbar { width: 6px; }
+        .chat-box::-webkit-scrollbar-track { background: #0b0c10; }
+        .chat-box::-webkit-scrollbar-thumb { background: #00f3ff; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <button id="audioToggleBtn" onclick="toggleAudio()" class="absolute top-4 right-4 text-gray-400 hover:text-[#00f3ff] z-40 transition-colors">
+        🔊
+    </button>
+
+    <!-- หน้าจอ Start Screen -->
+    <div id="startScreen" class="absolute top-0 left-0 w-full h-full bg-black bg-opacity-95 z-50 flex items-center justify-center p-4">
+        <div class="bg-[#1f2833] neon-border rounded-xl p-8 max-w-md w-full text-center shadow-2xl relative">
+            <div class="text-6xl mb-4 text-[#ffea00]">🛠️</div>
+            <h1 class="text-4xl font-bold neon-text mb-2 tracking-widest">CYBER-COOL<br>GARAGE</h1>
+            <p class="text-gray-300 mb-6">ภารกิจประกอบแอร์กู้ภัยเมืองร้อน!</p>
+            
+            <div class="bg-[#0b0c10] p-4 rounded-lg text-left mb-6 text-sm text-gray-400 space-y-2 border border-gray-700">
+                <p>⚡ สะสมพลังงานให้ได้ <strong class="text-[#39ff14]">10 / 10 คะแนน</strong></p>
+                <p>🕐 มีเวลาจำกัด 4 นาที (รวม 20 คำถาม)</p>
+                <p>❤️ ตอบผิดได้สูงสุดแค่ 3 ครั้งตลอดภารกิจ</p>
+            </div>
+
+            <input type="text" id="playerNameInput" class="name-input" placeholder="กรอกชื่อช่างแอร์ของคุณ..." maxlength="20" autocomplete="off">
+            <button class="btn-primary" onclick="startGame()">เริ่มภารกิจแฮกระบบ</button>
+            <button class="btn-primary mt-3" style="border-color: var(--neon-yellow); color: var(--neon-yellow);" onclick="window.open('https://script.google.com/macros/s/AKfycbzyluccDQbgWXlZDK9U2BVjSyImnFXhYSe9irpCSXs0oPwwziDrcrpARlhtm1Od9ksU0Q/exec', '_blank')">
+                🏆 ดูทำเนียบช่างแอร์
+            </button>
+        </div>
+    </div>
+
+    <!-- เกมและ HUD -->
+    <div id="gameContainer" class="w-full max-w-4xl hidden flex-col gap-4 relative z-10">
+        <div class="bg-[#1f2833] neon-border rounded-xl p-4 flex flex-col gap-3">
+            <div class="flex flex-wrap justify-between items-center gap-4">
+                <div class="flex items-center gap-4">
+                    <div id="timerDisplay" class="text-2xl font-bold text-[#00f3ff] bg-[#0b0c10] px-4 py-2 rounded-lg border border-[#00f3ff]">
+                        ⏱️ 04:00
+                    </div>
+                    <div class="text-xl text-[#39ff14] font-bold">
+                        ⚡ <span id="energyDisplay">0.0</span> / 10
+                    </div>
+                </div>
+                <div id="livesDisplay" class="text-2xl text-[#ff003c] tracking-widest drop-shadow-[0_0_5px_rgba(255,0,60,0.8)]">
+                    ❤️ ❤️ ❤️
+                </div>
+            </div>
+            <div class="w-full bg-[#0b0c10] border border-gray-600 rounded-full h-3">
+                <div id="progressBar" class="bg-[#39ff14] h-full rounded-full transition-all duration-500 shadow-[0_0_10px_#39ff14]" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-[#1f2833] rounded-xl p-4 border border-gray-700">
+                <h2 class="text-xl font-bold text-center text-[#00f3ff] mb-4 border-b border-gray-700 pb-2">สายพานอะไหล่ (ด่านภารกิจ)</h2>
+                <div class="grid grid-cols-2 gap-4" id="partsContainer">
+                    <div class="part-item" id="part-compressor" onclick="selectPart('compressor')">
+                        <div class="text-4xl mb-2">⚙️</div>
+                        <div class="font-bold text-sm">คอมเพรสเซอร์</div>
+                    </div>
+                    <div class="part-item" id="part-condenser" onclick="selectPart('condenser')">
+                        <div class="text-4xl mb-2">♨️</div>
+                        <div class="font-bold text-sm">คอนเดนเซอร์</div>
+                    </div>
+                    <div class="part-item" id="part-expansion" onclick="selectPart('expansion')">
+                        <div class="text-4xl mb-2">📉</div>
+                        <div class="font-bold text-sm text-[0.8rem]">เอ็กซ์แพนชันวาล์ว</div>
+                    </div>
+                    <div class="part-item" id="part-evaporator" onclick="selectPart('evaporator')">
+                        <div class="text-4xl mb-2">❄️</div>
+                        <div class="font-bold text-sm">อีแวปพอเรเตอร์</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-[#1f2833] rounded-xl p-4 border border-gray-700 relative">
+                <h2 class="text-xl font-bold text-center text-[#00f3ff] mb-4 border-b border-gray-700 pb-2">แปลนติดตั้งระบบ</h2>
+                <div class="grid grid-cols-2 gap-4 h-[250px]">
+                    <div class="blueprint-slot" id="slot-compressor" onclick="installPart('compressor')">
+                        <span>ติดตั้ง<br>ดูดและอัดน้ำยา</span>
+                    </div>
+                    <div class="blueprint-slot" id="slot-condenser" onclick="installPart('condenser')">
+                        <span>ติดตั้ง<br>ระบายความร้อน</span>
+                    </div>
+                    <div class="blueprint-slot" id="slot-expansion" onclick="installPart('expansion')">
+                        <span>ติดตั้ง<br>ลดแรงดัน</span>
+                    </div>
+                    <div class="blueprint-slot" id="slot-evaporator" onclick="installPart('evaporator')">
+                        <span>ติดตั้ง<br>ดูดซับความร้อน</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- หน้าต่างคำถาม -->
+    <div id="quizModal" class="hidden absolute top-0 left-0 w-full h-full bg-black bg-opacity-90 z-50 flex items-center justify-center p-4">
+        <div class="bg-[#1f2833] border-2 border-[#00f3ff] rounded-xl p-6 max-w-lg w-full shadow-[0_0_20px_rgba(0,243,255,0.3)] flex flex-col max-h-screen overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                <h3 class="text-xl font-bold text-[#ffea00]">🛡️ แฮกระบบความปลอดภัย</h3>
+                <span id="quizPartName" class="text-sm bg-[#0b0c10] px-3 py-1 rounded text-[#00f3ff]"></span>
+            </div>
+            
+            <div class="flex justify-between items-center mb-3">
+                <div id="quizQuestionCount" class="text-sm font-bold text-[#39ff14] bg-[#0b0c10] border border-[#39ff14] px-3 py-1 rounded-full inline-block shadow-[0_0_8px_rgba(57,255,20,0.3)]">
+                    คำถามที่ 1 / 5
+                </div>
+                <div class="text-xs text-gray-400">ตอบถูกข้อละ +0.5 คะแนน</div>
+            </div>
+
+            <p id="quizQuestion" class="text-lg mb-4 text-white font-medium"></p>
+            
+            <div id="quizHintBox" class="hidden mb-4 p-3 bg-yellow-900 bg-opacity-40 border border-yellow-500 rounded-lg text-yellow-200 text-sm flex items-start gap-2 transition-all">
+                💡
+                <div><strong class="text-yellow-400">คำใบ้:</strong> <span id="quizHintText"></span></div>
+            </div>
+
+            <div id="quizOptions" class="space-y-3 mb-6"></div>
+
+            <button onclick="openAIModal()" class="w-full bg-[#0b0c10] border border-blue-500 text-blue-400 p-3 rounded-lg hover:bg-blue-900 hover:text-white transition-all flex justify-center items-center gap-3 shadow-[0_0_10px_rgba(59,130,246,0.2)] hover:shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                <span class="colorful-robot text-2xl">🤖</span> 
+                <span class="font-bold tracking-wide">ไม่แน่ใจ? ปรึกษาลูกพี่ช่าง AI</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- หน้าต่าง AI Chat -->
+    <div id="aiModal" class="hidden absolute top-0 left-0 w-full h-full bg-black bg-opacity-90 z-[60] flex items-center justify-center p-4">
+        <div class="bg-[#1f2833] border border-blue-400 rounded-xl w-full max-w-md flex flex-col shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+            <div class="flex justify-between items-center p-4 border-b border-gray-700 bg-blue-900 bg-opacity-20 rounded-t-xl">
+                <h3 class="font-bold text-blue-400 flex items-center gap-2"><span class="colorful-robot text-xl">🤖</span> ลูกพี่ช่าง AI</h3>
+                <button onclick="closeAIModal()" class="text-gray-400 hover:text-white">✕</button>
+            </div>
+            
+            <div id="aiChatBox" class="chat-box p-4 h-64 overflow-y-auto flex flex-col gap-3 text-sm">
+                <div class="bg-[#0b0c10] border border-blue-500 text-blue-200 p-3 rounded-lg self-start max-w-[85%]">
+                    สวัสดีไอ้หนุ่มช่างแอร์! ติดปัญหาตรงไหน ถามลูกพี่มาได้เลย เดี๋ยวพี่จะช่วยใบ้คำตอบข้อนี้ให้!
+                </div>
+            </div>
+            
+            <div class="p-3 border-t border-gray-700 flex gap-2">
+                <input type="text" id="aiInput" class="flex-1 bg-[#0b0c10] border border-gray-600 rounded p-2 text-white outline-none focus:border-blue-400" placeholder="พิมพ์ถาม AI ที่นี่...">
+                <button onclick="askAI()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 rounded transition-colors">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- หน้าจอสรุปผล -->
+    <div id="endScreen" class="hidden absolute top-0 left-0 w-full h-full bg-black bg-opacity-95 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-[#1f2833] border-2 border-[#00f3ff] rounded-xl p-6 max-w-md w-full shadow-[0_0_30px_rgba(0,243,255,0.3)] text-center relative my-8">
+            <div class="text-6xl mb-4 text-[#00f3ff]" id="endIcon">👷</div>
+            <h2 id="endTitle" class="text-2xl font-bold text-white mb-2"></h2>
+            <div id="endSubtitle" class="text-sm font-semibold mb-4"></div>
+
+            <div class="bg-[#0b0c10] rounded-lg p-5 mb-4 text-left border border-gray-700">
+                <h3 class="text-[#39ff14] font-bold mb-3 text-[0.95rem]">อุปกรณ์ที่ได้:</h3>
+                <ul id="obtainedPartsList" class="text-[0.9rem] text-gray-300 space-y-2 mb-4"></ul>
+                
+                <h3 id="missingPartsTitle" class="text-[#ff003c] font-bold mb-3 text-[0.95rem]">อุปกรณ์ที่ขาดหาย:</h3>
+                <ul id="missingPartsList" class="text-[0.9rem] text-gray-500 space-y-2"></ul>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="bg-[#0b0c10] rounded-lg p-4 border border-gray-700">
+                    <div class="text-gray-400 text-[0.75rem] mb-1">คะแนนรวม</div>
+                    <div id="finalEnergy" class="text-2xl font-bold text-[#39ff14]"></div>
+                </div>
+                <div class="bg-[#0b0c10] rounded-lg p-4 border border-gray-700">
+                    <div class="text-gray-400 text-[0.75rem] mb-1">ตอบผิด</div>
+                    <div id="finalMistakes" class="text-2xl font-bold text-[#ff003c]"></div>
+                </div>
+                <div class="bg-[#0b0c10] rounded-lg p-4 border border-[#00f3ff]">
+                    <div class="text-gray-400 text-[0.75rem] mb-1">⏱️ เวลาที่ใช้</div>
+                    <div id="finalTime" class="text-2xl font-bold text-[#00f3ff]"></div>
+                </div>
+            </div>
+
+            <div id="playerRankDisplay" class="mt-4 mb-6 text-center font-bold text-[1rem]"></div>
+
+            <div class="flex flex-col gap-3">
+                <button class="btn-primary" onclick="location.reload()">เล่นอีกครั้ง</button>
+                <button class="btn-primary" style="border-color: var(--neon-yellow); color: var(--neon-yellow);" onclick="window.open('https://script.google.com/macros/s/AKfycbzyluccDQbgWXlZDK9U2BVjSyImnFXhYSe9irpCSXs0oPwwziDrcrpARlhtm1Od9ksU0Q/exec', '_blank')">
+                    🏆 ดูทำเนียบช่างแอร์
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gasUrl = "https://script.google.com/macros/s/AKfycbwRan2f3EZcbPI-4lK21FNR0oAtRDSBu429Mm9Aoupv2FY9K_setHIwzPSjI7rSWQWUdA/exec";
+        const apiKey = ""; 
+
+        let audioCtx = null;
+        let isAudioOn = true;
+        let bgmOscillator = null;
+        let bgmGain = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                playBGM();
+            } else if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleAudio() {
+            isAudioOn = !isAudioOn;
+            const btn = document.getElementById('audioToggleBtn');
+            if (isAudioOn) {
+                btn.innerHTML = '🔊';
+                btn.classList.replace('text-red-500', 'text-gray-400');
+                if(bgmGain) bgmGain.gain.setTargetAtTime(0.015, audioCtx.currentTime, 0.1);
+            } else {
+                btn.innerHTML = '🔇';
+                btn.classList.replace('text-gray-400', 'text-red-500');
+                if(bgmGain) bgmGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+            }
+        }
+
+        function playCorrectSound() {
+            if (!isAudioOn || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.15);
+        }
+
+        function playWrongSound() {
+            if (!isAudioOn || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.35);
+        }
+
+        function playBGM() {
+            if (!audioCtx) return;
+            bgmOscillator = audioCtx.createOscillator();
+            bgmGain = audioCtx.createGain();
+            bgmOscillator.connect(bgmGain);
+            bgmGain.connect(audioCtx.destination);
+            bgmOscillator.type = 'sine';
+            bgmOscillator.frequency.value = 55;
+            bgmGain.gain.value = isAudioOn ? 0.015 : 0;
+            bgmOscillator.start();
+        }
+
+        let score = 0;
+        let mistakes = 0;
+        let lives = 3;
+        let timeLeft = 240;
+        let timerInterval;
+        let selectedPart = null;
+        let installedParts = { compressor: false, condenser: false, expansion: false, evaporator: false };
+        
+        // ✅ บันทึกเวลาเริ่มต้นเมื่อเกมเริ่ม
+        let gameStartTime = null;
+
+        let currentTargetSlot = "";
+        let playerName = "";
+
+        let currentPartQuestions = [];
+        let currentQuestionIndex = 0;
+        let currentQuestionAnswer = "";
+        let currentHintText = "";
+
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+
+        const questionsDB = {
+            compressor: [
+                { q: "อุปกรณ์ใดทำหน้าที่ดูดและอัดสารทำความเย็นให้มีความดันสูง?", options: ["คอมเพรสเซอร์", "คอนเดนเซอร์", "เอ็กซ์แพนชันวาล์ว", "อีแวปพอเรเตอร์"], correct: "คอมเพรสเซอร์", hint: "คำว่า 'อัด' ภาษาอังกฤษคือ Compress นะช่าง!" },
+                { q: "คอมเพรสเซอร์เปรียบเสมือนอวัยวะใดของมนุษย์?", options: ["หัวใจ", "ปอด", "กระเพาะอาหาร", "สมอง"], correct: "หัวใจ", hint: "อวัยวะนี้ทำหน้าที่สูบฉีดเลือดไปเลี้ยงร่างกายตลอดเวลา" },
+                { q: "สารทำความเย็นที่ออกจากคอมเพรสเซอร์จะมีสถานะใด?", options: ["ก๊าซ ความดันสูง", "ของเหลว ความดันต่ำ", "ของเหลว ความดันสูง", "ก๊าซ ความดันต่ำ"], correct: "ก๊าซ ความดันสูง", hint: "เพิ่งถูกเครื่องอัดมาหมาดๆ มันต้องเป็นก๊าซที่แน่นและร้อนจัด!" },
+                { q: "คอมเพรสเซอร์ดูดสารทำความเย็นในสถานะใดเข้ามา?", options: ["ก๊าซ ความดันต่ำ", "ของเหลว ความดันสูง", "ก๊าซ ความดันสูง", "ของเหลว ความดันต่ำ"], correct: "ก๊าซ ความดันต่ำ", hint: "เป็นสถานะที่เพิ่งผ่านการดูดซับความร้อนจากในห้องมา" },
+                { q: "ข้อใดคือสาเหตุหลักที่ทำให้คอมเพรสเซอร์ทำงานหนักผิดปกติ?", options: ["คอยล์ร้อนสกปรกระบายความร้อนไม่ออก", "ล้างแอร์เป็นประจำ", "ตั้งอุณหภูมิ 25 องศา", "เติมน้ำยาแอร์ถูกต้อง"], correct: "คอยล์ร้อนสกปรกระบายความร้อนไม่ออก", hint: "ถ้าระบายความร้อนไม่ได้ ความดันในระบบจะสูงขึ้นจนเครื่องทำงานหนัก" },
+                { q: "อุปกรณ์ใดใช้พลังงานไฟฟ้ามากที่สุดในเครื่องปรับอากาศ?", options: ["คอมเพรสเซอร์", "พัดลมคอยล์เย็น", "พัดลมคอยล์ร้อน", "แผงวงจรควบคุม"], correct: "คอมเพรสเซอร์", hint: "เป็นหัวใจหลักที่มีมอเตอร์ขนาดใหญ่ที่สุดในระบบ" },
+                { q: "น้ำมันคอมเพรสเซอร์ในระบบแอร์มีหน้าที่อะไร?", options: ["หล่อลื่นชิ้นส่วนและระบายความร้อน", "เพิ่มความเย็นให้น้ำยา", "ล้างสิ่งสกปรกในท่อ", "ป้องกันไฟดูด"], correct: "หล่อลื่นชิ้นส่วนและระบายความร้อน", hint: "เครื่องจักรกลที่เคลื่อนที่ย่อมต้องการสารหล่อลื่นเพื่อลดการเสียดสี" },
+                { q: "คำว่า 'อัด' (Compress) ในระบบแอร์หมายถึงกระบวนการใด?", options: ["เพิ่มความดันและอุณหภูมิของก๊าซ", "ลดความดันของเหลว", "ทำให้น้ำยาเย็นลง", "เปลี่ยนของเหลวเป็นไอ"], correct: "เพิ่มความดันและอุณหภูมิของก๊าซ", hint: "การบีบอัดก๊าซในพื้นที่จำกัดจะทำให้ความดันและอุณหภูมิสูงขึ้น" },
+                { q: "โดยทั่วไปคอมเพรสเซอร์จะติดตั้งอยู่ส่วนใดของเครื่องปรับอากาศ?", options: ["ชุดคอยล์ร้อน (ภายนอกอาคาร)", "ชุดคอยล์เย็น (ภายในห้อง)", "ในท่อน้ำทิ้ง", "บนฝ้าเพดานห้องนอน"], correct: "ชุดคอยล์ร้อน (ภายนอกอาคาร)", hint: "เพราะเสียงดังและเกิดความร้อนสูง จึงต้องไว้ข้างนอก" },
+                { q: "หากคอมเพรสเซอร์หยุดทำงาน จะเกิดผลอย่างไรกับเครื่องปรับอากาศ?", options: ["แอร์จะมีแต่ลม ไม่มีความเย็น", "พัดลมคอยล์ร้อนจะหมุนเร็วขึ้น", "น้ำยาแอร์จะกลายเป็นน้ำแข็ง", "แอร์จะประหยัดไฟและเย็นขึ้น"], correct: "แอร์จะมีแต่ลม ไม่มีความเย็น", hint: "ถ้าหัวใจหยุดสูบฉีด น้ำยาก็ไม่หมุนเวียนไปทำความเย็น" }
+            ],
+            condenser: [
+                { q: "แผงคอยล์ร้อน (Condenser) ทำหน้าที่หลักคืออะไร?", options: ["ระบายความร้อนออกสู่นอกห้อง", "ดูดความร้อนจากในห้อง", "ฉีดน้ำยาให้เป็นฝอย", "ดูดความชื้นในอากาศ"], correct: "ระบายความร้อนออกสู่นอกห้อง", hint: "ชื่อก็บอกว่า 'คอยล์ร้อน' มันมักจะตั้งอยู่ริมระเบียงเพื่อเป่าลมร้อนทิ้ง" },
+                { q: "น้ำยาแอร์เมื่อผ่านคอนเดนเซอร์ จะเปลี่ยนสถานะอย่างไร?", options: ["ก๊าซ -> ของเหลว", "ของเหลว -> ก๊าซ", "ของแข็ง -> ของเหลว", "ไม่เปลี่ยนสถานะ"], correct: "ก๊าซ -> ของเหลว", hint: "เมื่อก๊าซถูกระบายความร้อนออก มันจะ 'ควบแน่น' กลายเป็นน้ำ (ของเหลว)" },
+                { q: "หากคอนเดนเซอร์ระบายความร้อนไม่ดี จะเกิดผลอย่างไร?", options: ["คอมเพรสเซอร์อาจทำงานหนักจนตัดการทำงาน", "แอร์จะเย็นกว่าปกติ", "แอร์จะกินไฟน้อยลง", "พัดลมคอยล์เย็นจะหมุนเร็วขึ้น"], correct: "คอมเพรสเซอร์อาจทำงานหนักจนตัดการทำงาน", hint: "ความร้อนในระบบจะสะสมมากเกินไป จนหัวใจหลักรับไม่ไหว" },
+                { q: "ลมที่พัดออกมาจากชุดคอนเดนเซอร์ จะมีลักษณะแบบใด?", options: ["ลมร้อน", "ลมเย็นเฉียบ", "ลมชื้น", "ลมเย็นและแห้ง"], correct: "ลมร้อน", hint: "เพราะมันกำลังเอาความร้อนจากในห้องมาทิ้งสู่ภายนอก" },
+                { q: "พัดลมที่ติดตั้งอยู่คู่กับแผงคอนเดนเซอร์มีหน้าที่อะไร?", options: ["ดูดอากาศผ่านแผงเพื่อช่วยระบายความร้อน", "เป่าลมเย็นเข้าบ้าน", "เป่าความชื้นออกจากท่อ", "ช่วยให้คอมเพรสเซอร์หมุน"], correct: "ดูดอากาศผ่านแผงเพื่อช่วยระบายความร้อน", hint: "พัดลมตัวนี้ช่วยพาความร้อนออกจากครีบอลูมิเนียมของแผงคอยล์" },
+                { q: "ตำแหน่งติดตั้งคอนเดนเซอร์ที่ดีควรเป็นอย่างไร?", options: ["พื้นที่โปร่ง อากาศถ่ายเทสะดวก", "ในห้องเก็บของที่ปิดมิดชิด", "วางชิดติดกำแพงเพื่อความสวยงาม", "วางไว้ในห้องนอนใกล้หน้าต่าง"], correct: "พื้นที่โปร่ง อากาศถ่ายเทสะดวก", hint: "ถ้าระบายอากาศไม่ได้ ความร้อนจะวนกลับเข้าไปใหม่" },
+                { q: "สารทำความเย็นที่ 'ไหลเข้า' สู่คอนเดนเซอร์มีลักษณะใด?", options: ["ก๊าซ ความดันสูง อุณหภูมิสูง", "ของเหลว ความดันต่ำ อุณหภูมิต่ำ", "ของเหลว ความดันสูง", "ก๊าซ ความดันต่ำ"], correct: "ก๊าซ ความดันสูง อุณหภูมิสูง", hint: "เป็นสถานะที่เพิ่งถูกอัดออกมาจากคอมเพรสเซอร์หมาดๆ" },
+                { q: "การฉีดน้ำล้างแผงคอนเดนเซอร์มีผลดีอย่างไร?", options: ["ทำให้ระบายความร้อนดีขึ้น ประหยัดไฟ", "ทำให้น้ำยาแอร์เพิ่มขึ้น", "ลดเสียงดังของคอมเพรสเซอร์", "ทำให้แผงคอยล์เย็นขึ้นน้ำแข็ง"], correct: "ทำให้ระบายความร้อนดีขึ้น ประหยัดไฟ", hint: "เมื่อแผงสะอาด ลมก็ผ่านได้สะดวก การแลกเปลี่ยนความร้อนก็ดีขึ้น" },
+                { q: "คอนเดนเซอร์มีหลักการทำงานคล้ายคลึงกับชิ้นส่วนใดในรถยนต์?", options: ["หม้อน้ำ", "ท่อไอเสีย", "พวงมาลัย", "ถังน้ำมัน"], correct: "หม้อน้ำ", hint: "หม้อน้ำหน้ารถทำหน้าที่ระบายความร้อนของเครื่องยนต์ คล้ายๆ กันเลย!" },
+                { q: "การ 'ควบแน่น' ในคอนเดนเซอร์เกิดขึ้นเมื่อใด?", options: ["เมื่อสารทำความเย็นคายความร้อนออก", "เมื่อลดแรงดันสารทำความเย็น", "เมื่อสารทำความเย็นดูดความร้อน", "เมื่อคอมเพรสเซอร์หยุดทำงาน"], correct: "เมื่อสารทำความเย็นคายความร้อนออก", hint: "การคายความร้อนทำให้ก๊าซเปลี่ยนสถานะกลับไปเป็นของเหลว" }
+            ],
+            expansion: [
+                { q: "เอ็กซ์แพนชันวาล์ว (Expansion Valve) ทำหน้าที่อะไรในระบบ?", options: ["ลดความดันและอุณหภูมิของน้ำยา", "เพิ่มความดันให้น้ำยา", "ดูดซับความร้อนจากอากาศ", "สูบฉีดสารทำความเย็น"], correct: "ลดความดันและอุณหภูมิของน้ำยา", hint: "มันคือรูเล็กๆ ที่ทำให้น้ำยาอั้นไว้ แล้วฉีดพ่นออกมา ทำให้แรงดันตก" },
+                { q: "สารทำความเย็นที่ผ่านเอ็กซ์แพนชันวาล์วออกมา จะมีลักษณะอย่างไร?", options: ["ฝอยละอองของเหลวอุณหภูมิต่ำ", "ก๊าซร้อนจัด", "ของเหลวเดือด", "ของเหลวอุณหภูมิสูง"], correct: "ฝอยละอองของเหลวอุณหภูมิต่ำ", hint: "นึกภาพเวลาเรากดหัวสเปรย์ปรับอากาศ มันจะออกมาเป็นละอองและเย็นเฉียบ" },
+                { q: "อุปกรณ์ใดทำหน้าที่ควบคุมปริมาณน้ำยาแอร์ที่ไหลเข้าสู่คอยล์เย็น?", options: ["เอ็กซ์แพนชันวาล์ว", "คอมเพรสเซอร์", "เทอร์โมสตัท", "มอเตอร์พัดลม"], correct: "เอ็กซ์แพนชันวาล์ว", hint: "วาล์วตัวนี้จะเปิด-ปิดรูเข็มเพื่อจ่ายน้ำยาให้พอดีกับความร้อนในห้อง" },
+                { q: "เอ็กซ์แพนชันวาล์ว ถูกติดตั้งอยู่ระหว่างอุปกรณ์ใดในระบบ?", options: ["คอนเดนเซอร์ กับ อีแวปพอเรเตอร์", "อีแวปพอเรเตอร์ กับ คอมเพรสเซอร์", "คอมเพรสเซอร์ กับ คอนเดนเซอร์", "พัดลมแอร์ กับ แผ่นกรองฝุ่น"], correct: "คอนเดนเซอร์ กับ อีแวปพอเรเตอร์", hint: "รับของเหลวอุ่นๆ มาจากแผงคอยล์ร้อน ก่อนส่งต่อไปทำความเย็นที่คอยล์เย็น" },
+                { q: "หลักการทำงานของเอ็กซ์แพนชันวาล์ว คล้ายกับสิ่งใดในชีวิตประจำวัน?", options: ["การกดหัวฉีดกระป๋องสเปรย์", "การต้มน้ำให้เดือด", "การสูบลมยางรถจักรยาน", "การเปิดพัดลม"], correct: "การกดหัวฉีดกระป๋องสเปรย์", hint: "การบีบให้ของเหลวไหลผ่านรูเล็กๆ จะทำให้เกิดการลดความดันและเย็นลง" },
+                { q: "ทำไมจึงต้องฉีดสารทำความเย็นให้เป็นฝอยละอองก่อนเข้าคอยล์เย็น?", options: ["เพื่อให้ง่ายต่อการระเหยและดูดซับความร้อน", "เพื่อประหยัดปริมาณน้ำยาแอร์", "เพื่อป้องกันท่อน้ำยาแตก", "เพื่อลดเสียงดังเวลาทำงาน"], correct: "เพื่อให้ง่ายต่อการระเหยและดูดซับความร้อน", hint: "ละอองฝอยมีพื้นที่ผิวสัมผัสมาก ทำให้ดูดกลืนความร้อนได้เร็ว" },
+                { q: "สารทำความเย็นก่อนที่จะ 'เข้า' เอ็กซ์แพนชันวาล์ว มีลักษณะใด?", options: ["ของเหลว ความดันสูง", "ก๊าซ ความดันต่ำ", "ของเหลว ความดันต่ำ", "ก๊าซ ความดันสูง"], correct: "ของเหลว ความดันสูง", hint: "เป็นของเหลวที่เพิ่งควบแน่นมาจากแผงคอยล์ร้อน" },
+                { q: "หากเอ็กซ์แพนชันวาล์วเกิดการอุดตัน จะเกิดผลอย่างไร?", options: ["น้ำยาไม่ไหลไปคอยล์เย็น แอร์ไม่เย็น", "คอมเพรสเซอร์จะหมุนเร็วขึ้น", "ลมแอร์จะแรงขึ้น", "คอยล์ร้อนจะเป็นน้ำแข็ง"], correct: "น้ำยาไม่ไหลไปคอยล์เย็น แอร์ไม่เย็น", hint: "เมื่อท่อตีบตัน น้ำยาก็ไม่สามารถเข้าไปสร้างความเย็นได้" },
+                { q: "ท่อชนิดใดที่ทำหน้าที่คล้ายเอ็กซ์แพนชันวาล์วในแอร์ขนาดเล็ก?", options: ["ท่อแคปทิ้ว (Capillary Tube)", "ท่อทองแดงขนาดใหญ่", "ท่อน้ำทิ้ง", "ท่อหุ้มฉนวน"], correct: "ท่อแคปทิ้ว (Capillary Tube)", hint: "เป็นท่อทองแดงเส้นเล็กๆ ที่ขดตัวไปมา ทำหน้าที่ลดแรงดันเช่นเดียวกัน" },
+                { q: "คำว่า 'Expansion' หมายถึงกระบวนการใดในทางเทอร์โมไดนามิกส์?", options: ["การขยายตัวเพื่อลดแรงดัน", "การบีบอัดเพิ่มแรงดัน", "การระเหยกลายเป็นไอ", "การควบแน่นเป็นของเหลว"], correct: "การขยายตัวเพื่อลดแรงดัน", hint: "เมื่อน้ำยาถูกฉีดผ่านรูเล็กๆ ออกสู่พื้นที่ที่กว้างกว่า มันจะเกิดการขยายตัว" }
+            ],
+            evaporator: [
+                { q: "แผงคอยล์เย็น (Evaporator) มีหน้าที่หลักคืออะไร?", options: ["ดูดซับความร้อนจากอากาศภายในห้อง", "ระบายความร้อนออกนอกบ้าน", "ผลิตสารทำความเย็น", "สร้างความชื้นให้ห้อง"], correct: "ดูดซับความร้อนจากอากาศภายในห้อง", hint: "ลมที่พัดผ่านแผงนี้จะเย็นลง เพราะตัวมันดึงเอาความร้อนในห้องออกไป" },
+                { q: "สารทำความเย็นเมื่อรับความร้อนที่อีแวปพอเรเตอร์ จะเกิดการเปลี่ยนสถานะอย่างไร?", options: ["ระเหยกลายเป็นก๊าซ", "ควบแน่นเป็นของเหลว", "เปลี่ยนเป็นของแข็ง", "สลายตัวเป็นน้ำ"], correct: "ระเหยกลายเป็นก๊าซ", hint: "เมื่อละอองของเหลวได้รับความร้อน มันก็จะ 'เดือดและระเหย' กลายเป็นไอ" },
+                { q: "หยดน้ำที่ไหลออกจากท่อน้ำทิ้งแอร์ เกิดจากกระบวนการใดที่คอยล์เย็น?", options: ["การควบแน่นของความชื้นในห้องเมื่อสัมผัสความเย็น", "น้ำยาแอร์รั่วซึม", "น้ำแข็งละลายจากคอมเพรสเซอร์", "การทำงานผิดปกติของวาล์ว"], correct: "การควบแน่นของความชื้นในห้องเมื่อสัมผัสความเย็น", hint: "เหมือนเราเอาน้ำแข็งใส่แก้ว แล้วมีหยดน้ำเกาะข้างแก้ว" },
+                { q: "พัดลมกรงกระรอกที่อยู่ในตัวแอร์ (คอยล์เย็น) ทำหน้าที่อะไร?", options: ["ดูดอากาศในห้องมาผ่านแผงทำความเย็นแล้วเป่าออก", "ระบายความร้อนให้มอเตอร์", "พัดไล่ฝุ่นออกจากเครื่อง", "เป่าน้ำยาให้ไหลเวียนในท่อ"], correct: "ดูดอากาศในห้องมาผ่านแผงทำความเย็นแล้วเป่าออก", hint: "เป็นตัวการที่ทำให้เกิดลมเย็นๆ มาปะทะตัวเรา" },
+                { q: "หากแผ่นกรองฝุ่น (Filter) และแผงคอยล์เย็นอุดตันสกปรก จะส่งผลอย่างไร?", options: ["ลมแอร์ออกน้อยและห้องไม่เย็น", "แอร์จะประหยัดไฟขึ้น", "คอมเพรสเซอร์จะไม่ทำงาน", "พัดลมคอยล์ร้อนจะพัง"], correct: "ลมแอร์ออกน้อยและห้องไม่เย็น", hint: "ลมไม่สามารถทะลุผ่านฝุ่นหนาๆ ออกมาได้" },
+                { q: "สารทำความเย็นที่ 'ออกจาก' แผงอีแวปพอเรเตอร์ มีสถานะใด?", options: ["ก๊าซ ความดันต่ำ", "ของเหลว ความดันต่ำ", "ก๊าซ ความดันสูง", "ของเหลว ความดันสูง"], correct: "ก๊าซ ความดันต่ำ", hint: "ระเหยกลายเป็นไอจนหมดแล้ว และเตรียมถูกดูดกลับไปที่คอมเพรสเซอร์" },
+                { q: "กระบวนการ 'ระเหย' (Evaporation) ในระบบปรับอากาศหมายถึงอะไร?", options: ["ของเหลวเดือดกลายเป็นไอโดยการดูดความร้อน", "การเปลี่ยนไอเป็นของเหลวโดยการคายความร้อน", "การเพิ่มความดันของก๊าซ", "การฉีดน้ำให้เป็นฝอย"], correct: "ของเหลวเดือดกลายเป็นไอโดยการดูดความร้อน", hint: "การระเหยต้องใช้พลังงานความร้อน จึงทำให้รอบข้างเย็นลง" },
+                { q: "โดยปกติแผงอีแวปพอเรเตอร์จะถูกติดตั้งอยู่ที่ใด?", options: ["ในชุดคอยล์เย็น (แฟนคอยล์ยูนิต) ภายในห้อง", "ในชุดคอยล์ร้อน ภายนอกอาคาร", "ติดกับท่อทองแดงนอกบ้าน", "ใต้เพดานห้องน้ำ"], correct: "ในชุดคอยล์เย็น (แฟนคอยล์ยูนิต) ภายในห้อง", hint: "เพราะมันต้องทำหน้าที่ดูดความร้อนภายในพื้นที่ที่เราต้องการให้เย็น" },
+                { q: "ถ้าแผงคอยล์เย็นมีน้ำแข็งเกาะ มักมีสาเหตุจากอะไร?", options: ["แผงคอยล์หรือฟิลเตอร์ตัน ทำให้แลกเปลี่ยนความร้อนไม่ได้", "เปิดแอร์อุณหภูมิต่ำเกินไป", "คอมเพรสเซอร์ทำงานเบาเกินไป", "ตั้งความแรงพัดลมไว้เบาสุด"], correct: "แผงคอยล์หรือฟิลเตอร์ตัน ทำให้แลกเปลี่ยนความร้อนไม่ได้", hint: "เมื่อลมผ่านไม่ได้ น้ำยาที่เย็นจัดก็ไม่ได้ดูดความร้อน จนกลายเป็นน้ำแข็งเกาะท่อ" },
+                { q: "ความรู้สึก 'เย็นสบาย' เมื่อเปิดแอร์ มาจากผลงานของชิ้นส่วนใดมากที่สุด?", options: ["อีแวปพอเรเตอร์", "คอมเพรสเซอร์", "คอนเดนเซอร์", "เอ็กซ์แพนชันวาล์ว"], correct: "อีแวปพอเรเตอร์", hint: "มันคือชิ้นส่วนที่ทำหน้าที่ดูดซับความร้อนจากอากาศที่ไหลผ่านตัวมันโดยตรง" }
+            ]
+        };
+
+        const partNamesTH = {
+            compressor: "⚙️ คอมเพรสเซอร์", condenser: "♨️ คอนเดนเซอร์",
+            expansion: "📉 เอ็กซ์แพนชันวาล์ว", evaporator: "❄️ อีแวปพอเรเตอร์"
+        };
+
+        function startGame() {
+            const nameInput = document.getElementById('playerNameInput');
+            playerName = nameInput.value.trim();
+
+            if (!playerName) {
+                nameInput.classList.add('input-error');
+                setTimeout(() => nameInput.classList.remove('input-error'), 500);
+                return;
+            }
+
+            initAudio();
+
+            // ✅ บันทึก timestamp จริงเมื่อเกมเริ่ม
+            gameStartTime = Date.now();
+
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('gameContainer').classList.replace('hidden', 'flex');
+            
+            startTimer();
+            updateProgressBar();
+        }
+
+        function startTimer() {
+            const timerDisplay = document.getElementById('timerDisplay');
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerDisplay.innerHTML = `⏱️ ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (timeLeft <= 30) {
+                    timerDisplay.classList.add('text-[#ff003c]', 'alert-flash');
+                    timerDisplay.classList.remove('text-[#00f3ff]');
+                }
+
+                if (timeLeft <= 0) endGame(false);
+            }, 1000);
+        }
+
+        function updateLives() {
+            let hearts = "";
+            for (let i = 0; i < 3; i++) {
+                if (i < lives) hearts += '❤️ ';
+                else hearts += '🖤 ';
+            }
+            document.getElementById('livesDisplay').innerHTML = hearts;
+        }
+
+        function updateProgressBar() {
+            const percent = (score / 10) * 100;
+            document.getElementById('progressBar').style.width = `${percent}%`;
+            document.getElementById('energyDisplay').innerText = score.toFixed(1);
+        }
+
+        function selectPart(partId) {
+            if (installedParts[partId]) return;
+            document.querySelectorAll('.part-item').forEach(el => el.classList.remove('selected'));
+            document.getElementById(`part-${partId}`).classList.add('selected');
+            selectedPart = partId;
+
+            document.querySelectorAll('.blueprint-slot').forEach(el => {
+                if (!el.classList.contains('installed')) el.classList.add('active');
+            });
+        }
+
+        function installPart(slotId) {
+            if (!selectedPart || installedParts[slotId]) return;
+
+            if (selectedPart === slotId) {
+                currentTargetSlot = slotId;
+                startQuizSequence(slotId);
+            } else {
+                playWrongSound();
+                mistakes++;
+                lives--;
+                updateLives();
+                
+                const slot = document.getElementById(`slot-${slotId}`);
+                slot.style.borderColor = "var(--neon-pink)";
+                slot.style.color = "var(--neon-pink)";
+                setTimeout(() => {
+                    slot.style.borderColor = "";
+                    slot.style.color = "";
+                }, 500);
+
+                if (lives <= 0) endGame(false);
+            }
+        }
+
+        function getRandomQuestions(partId, count) {
+            const pool = [...questionsDB[partId]];
+            for (let i = pool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pool[i], pool[j]] = [pool[j], pool[i]];
+            }
+            return pool.slice(0, count);
+        }
+
+        function startQuizSequence(partId) {
+            currentPartQuestions = getRandomQuestions(partId, 5);
+            currentQuestionIndex = 0;
+            
+            document.getElementById('quizPartName').innerText = partNamesTH[partId];
+            document.getElementById('quizModal').classList.remove('hidden');
+            
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            const questionData = currentPartQuestions[currentQuestionIndex];
+
+            document.getElementById('quizQuestionCount').innerText = `คำถามที่ ${currentQuestionIndex + 1} / 5`;
+            document.getElementById('quizQuestion').innerText = questionData.q;
+            currentQuestionAnswer = questionData.correct;
+            currentHintText = questionData.hint;
+
+            document.getElementById('quizHintBox').classList.add('hidden');
+
+            const optionsDiv = document.getElementById('quizOptions');
+            optionsDiv.innerHTML = '';
+
+            let shuffledOpts = [...questionData.options];
+            for (let i = shuffledOpts.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffledOpts[i], shuffledOpts[j]] = [shuffledOpts[j], shuffledOpts[i]];
+            }
+
+            shuffledOpts.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.id = `optBtn_${index}`;
+                btn.className = "w-full text-left p-3 rounded-lg border border-gray-600 hover:border-[#00f3ff] hover:bg-[#00f3ff] hover:text-black transition-all text-gray-200 font-medium";
+                btn.innerText = `${index + 1}. ${opt}`;
+                btn.onclick = () => checkAnswer(opt, btn);
+                optionsDiv.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedOptText, btnElement) {
+            const allBtns = document.getElementById('quizOptions').querySelectorAll('button');
+
+            if (selectedOptText === currentQuestionAnswer) {
+                playCorrectSound();
+                
+                btnElement.classList.remove('border-gray-600', 'hover:border-[#00f3ff]', 'hover:bg-[#00f3ff]', 'hover:text-black');
+                btnElement.classList.add('bg-[#39ff14]', 'text-black', 'border-[#39ff14]', 'font-bold');
+                
+                allBtns.forEach(b => b.disabled = true);
+
+                score += 0.5;
+                updateProgressBar();
+
+                setTimeout(() => {
+                    if (currentQuestionIndex < 4) {
+                        currentQuestionIndex++;
+                        renderQuizQuestion();
+                    } else {
+                        finishPartInstallation();
+                    }
+                }, 800);
+
+            } else {
+                playWrongSound();
+                mistakes++;
+                lives--;
+                updateLives();
+                
+                btnElement.disabled = true;
+                btnElement.classList.remove('hover:border-[#00f3ff]', 'hover:bg-[#00f3ff]', 'hover:text-black');
+                btnElement.classList.add('opacity-30', 'border-[#ff003c]', 'text-[#ff003c]', 'cursor-not-allowed');
+
+                const hintBox = document.getElementById('quizHintBox');
+                hintBox.classList.remove('hidden');
+                document.getElementById('quizHintText').innerText = currentHintText;
+
+                const modalBox = document.getElementById('quizModal').firstElementChild;
+                modalBox.classList.add('border-[#ff003c]');
+                setTimeout(() => modalBox.classList.remove('border-[#ff003c]'), 400);
+
+                if (lives <= 0) {
+                    setTimeout(() => endGame(false), 500);
+                }
+            }
+        }
+
+        function finishPartInstallation() {
+            document.getElementById('quizModal').classList.add('hidden');
+            
+            installedParts[currentTargetSlot] = true;
+            
+            document.getElementById(`part-${currentTargetSlot}`).classList.add('disabled', 'opacity-30');
+            document.getElementById(`part-${currentTargetSlot}`).classList.remove('selected');
+            
+            const slot = document.getElementById(`slot-${currentTargetSlot}`);
+            slot.classList.remove('active');
+            slot.classList.add('installed');
+            slot.innerHTML = `<div class="text-2xl mb-1">${partNamesTH[currentTargetSlot].split(' ')[0]}</div><div class="text-xs">สำเร็จ</div>`;
+
+            selectedPart = null;
+            document.querySelectorAll('.blueprint-slot').forEach(el => el.classList.remove('active'));
+
+            if (score >= 10) {
+                setTimeout(() => endGame(true), 600);
+            }
+        }
+
+        function openAIModal() {
+            document.getElementById('aiModal').classList.remove('hidden');
+        }
+
+        function closeAIModal() {
+            document.getElementById('aiModal').classList.add('hidden');
+        }
+
+        async function askAI() {
+            const inputEl = document.getElementById('aiInput');
+            const userText = inputEl.value.trim();
+            if(!userText) return;
+
+            const chatBox = document.getElementById('aiChatBox');
+            
+            chatBox.innerHTML += `<div class="bg-[#1f2833] border border-gray-600 text-gray-200 p-2 rounded-lg self-end max-w-[85%]">${userText}</div>`;
+            inputEl.value = "";
+            
+            const loadingId = "loading_" + Date.now();
+            chatBox.innerHTML += `<div id="${loadingId}" class="text-blue-400 text-xs italic self-start ml-2">ลูกพี่กำลังคิด... ⟳</div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const systemPrompt = "คุณคือช่างแอร์ไซเบอร์รุ่นเก๋าชื่อ 'ลูกพี่ AI' คอยสอนเด็กฝึกงานในเกม Cyber-Cool Garage ตอบคำถามเรื่องระบบปรับอากาศให้กระชับ เข้าใจง่าย เป็นกันเอง ห้ามเกิน 3 บรรทัด";
+                const questionContext = `ตอนนี้ผู้เล่นกำลังเจอคำถาม: "${document.getElementById('quizQuestion').innerText}" และคำถามของผู้เล่นคือ: ${userText}`;
+
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: questionContext }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    })
+                });
+                const result = await response.json();
+                const aiText = result.candidates[0].content.parts[0].text;
+                
+                document.getElementById(loadingId).remove();
+                chatBox.innerHTML += `<div class="bg-[#0b0c10] border border-blue-500 text-blue-200 p-3 rounded-lg self-start max-w-[85%]">${aiText}</div>`;
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                chatBox.innerHTML += `<div class="bg-red-900 border border-red-500 text-white p-2 rounded-lg self-start max-w-[85%]">การเชื่อมต่อศูนย์บัญชาการขัดข้อง ลองถามใหม่นะไอ้หนุ่ม</div>`;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        document.getElementById("aiInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                askAI();
+            }
+        });
+
+        // ✅ ส่ง timeTaken (วินาทีที่ใช้จริง) ไปบันทึก
+        function submitScoreToSheet(name, finalScore, finalMistakes, timeTaken) {
+            const url = `${gasUrl}?action=addScore&name=${encodeURIComponent(name)}&score=${finalScore}&mistakes=${finalMistakes}&time=${timeTaken}`;
+            fetch(url, { mode: 'no-cors' }).catch(e => console.log(e));
+        }
+
+        function endGame(isWin) {
+            clearInterval(timerInterval);
+            if(bgmGain && audioCtx) {
+                bgmGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.5); 
+            }
+
+            // ✅ คำนวณเวลาที่ใช้จริงจาก timestamp (แม่นยำกว่าใช้ timeLeft)
+            const timeTaken = gameStartTime
+                ? Math.round((Date.now() - gameStartTime) / 1000)
+                : (240 - timeLeft);
+            
+            document.getElementById('gameContainer').classList.add('hidden');
+            document.getElementById('quizModal').classList.add('hidden');
+            document.getElementById('aiModal').classList.add('hidden');
+            document.getElementById('endScreen').classList.remove('hidden');
+
+            const title = document.getElementById('endTitle');
+            const subtitle = document.getElementById('endSubtitle');
+            const endIcon = document.getElementById('endIcon');
+            const obtainedList = document.getElementById('obtainedPartsList');
+            const missingList = document.getElementById('missingPartsList');
+            const missingTitle = document.getElementById('missingPartsTitle');
+            const rankDisplay = document.getElementById('playerRankDisplay');
+            
+            document.getElementById('finalEnergy').innerText = `${score.toFixed(1)} / 10`;
+            document.getElementById('finalMistakes').innerText = `${mistakes} ครั้ง`;
+            // ✅ แสดงเวลาจริงที่ใช้
+            document.getElementById('finalTime').innerText = formatTime(timeTaken);
+
+            obtainedList.innerHTML = '';
+            missingList.innerHTML = '';
+            let obtainedCount = 0;
+
+            for (const [key, name] of Object.entries(partNamesTH)) {
+                const li = document.createElement('li');
+                li.innerHTML = name;
+                if (installedParts[key]) {
+                    obtainedList.appendChild(li);
+                    obtainedCount++;
+                } else {
+                    li.classList.add('line-through', 'opacity-70');
+                    missingList.appendChild(li);
+                }
+            }
+
+            if (obtainedCount === 4 && score >= 10) {
+                title.innerText = "การประกอบเสร็จสมบูรณ์! 🛠️";
+                title.style.color = "var(--neon-cyan)";
+                subtitle.innerHTML = `<span style="color:var(--neon-green);">ประกอบเครื่องปรับอากาศสำเร็จ 100%!</span> <br><br> <span style="color:white; font-size: 1.1rem;">ผลงานของ: <span style="color:var(--neon-yellow);">ช่าง${playerName}</span></span>`;
+                endIcon.style.color = "var(--neon-cyan)";
+                missingTitle.style.display = 'none';
+                missingList.style.display = 'none';
+            } else {
+                title.innerText = "ประกอบได้บางส่วน! 🔧";
+                title.style.color = "#c5c6c7";
+                subtitle.innerHTML = `<span style="color:white; font-size: 1.1rem;">ผลงานของ: <span style="color:var(--neon-yellow);">ช่าง${playerName}</span></span>`;
+                endIcon.style.color = "#c5c6c7";
+                missingTitle.style.display = 'block';
+                missingList.style.display = 'block';
+            }
+
+            let rankText = "";
+            let rankColor = "";
+            if (score >= 10) { rankText = "นายช่างใหญ่แอร์ไซเบอร์"; rankColor = "var(--neon-cyan)"; }
+            else if (score >= 7.5) { rankText = "ช่างแอร์มือใหม่"; rankColor = "var(--neon-green)"; }
+            else if (score >= 5) { rankText = "เด็กฝึกงาน"; rankColor = "var(--neon-yellow)"; }
+            else if (score >= 2.5) { rankText = "เพิ่งเริ่มต้น"; rankColor = "#ff9900"; }
+            else { rankText = "ล้มเหลว (ต้องฝึกฝนใหม่)"; rankColor = "var(--neon-pink)"; }
+
+            rankDisplay.innerHTML = `ระดับช่างของคุณ: <span style="color: ${rankColor};">${rankText}</span>`;
+
+            // ✅ ส่งเวลาจริงไปบันทึกใน Google Sheets
+            submitScoreToSheet(playerName, score, mistakes, timeTaken);
+        }
+    </script>
+</body>
+</html>
